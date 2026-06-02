@@ -2,3 +2,18 @@ node_modules
 .env
 .env.production
 .env.development
+# Add this line to your root .gitignore
+infra/terraform.tfvars
+infra/.terraform/
+infra/*.tfstate
+infra/*.tfstate.backup
+
+# Env files
+*.env
+.env
+api/api.env
+client/client.env
+infra/terraform.tfvars
+infra/.terraform/
+infra/*.tfstate
+infra/*.tfstate.backup

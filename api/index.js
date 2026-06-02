@@ -54,4 +54,7 @@ app.listen(process.env.PORT || 8000, (err) => {
   console.log(`Server is running on port no. ${process.env.PORT}`);
 });
 
+// In your main Express file
+app.get('/health', (req, res) => res.status(200).json({ status: 'ok' }));
+
 module.exports = app;

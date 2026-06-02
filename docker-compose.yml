@@ -1,0 +1,53 @@
+version: "3.9"
+
+# ─────────────────────────────────────────────────────────────────
+# Local dev/testing compose file
+# Run:  docker compose up --build
+# Stop: docker compose down
+# ─────────────────────────────────────────────────────────────────
+
+services:
+
+  # ── Backend (Node / Express) ─────────────────────────────────────
+  backend:
+    build:
+      context: ./api
+      dockerfile: Dockerfile.backend
+    container_name: airbnb_backend
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DB_URL: ${DB_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRY: ${JWT_EXPIRY}
+      COOKIE_TIME: ${COOKIE_TIME}
+      SESSION_SECRET: ${SESSION_SECRET}
+      CLOUDINARY_NAME: ${CLOUDINARY_NAME}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
+      CLIENT_URL: ${CLIENT_URL}
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:4000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+  # ── Frontend (React + Nginx) ─────────────────────────────────────
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.frontend
+      args:
+        VITE_BASE_URL: ${VITE_BASE_URL}
+        VITE_GOOGLE_CLIENT_ID: ${VITE_GOOGLE_CLIENT_ID}
+    container_name: airbnb_frontend
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    depends_on:
+      backend:
+        condition: service_healthy
